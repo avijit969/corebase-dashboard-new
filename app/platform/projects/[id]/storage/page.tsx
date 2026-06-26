@@ -18,7 +18,7 @@ export default function StoragePage({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] bg-neutral-950 text-white overflow-hidden">
+        <div className="flex h-[calc(100vh-4rem)] bg-[#07070f] text-white overflow-hidden">
             {/* Desktop Sidebar */}
             <BucketSidebar
                 apiKey={apiKey}
@@ -28,8 +28,8 @@ export default function StoragePage({ params }: { params: { id: string } }) {
             />
 
             {/* Mobile Sidebar (Sheet) */}
-            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen} >
-                <SheetContent side="left" className="border-r-0 bg-neutral-900 w-80 max-w-[80vw]" showCloseButton={false}>
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+                <SheetContent side="left" className="border-r-0 bg-[#09090f] w-72 max-w-[80vw] p-0" showCloseButton={false}>
                     <BucketSidebar
                         apiKey={apiKey}
                         selectedBucket={selectedBucket}
@@ -42,8 +42,8 @@ export default function StoragePage({ params }: { params: { id: string } }) {
                 </SheetContent>
             </Sheet>
 
-            {/* Main Content for Files */}
-            <div className="flex-1 flex flex-col min-w-0 bg-neutral-900/50">
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0 bg-[#0d0d18]">
                 <FileBrowser
                     apiKey={apiKey}
                     bucketName={selectedBucket}

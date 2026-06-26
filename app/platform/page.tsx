@@ -63,7 +63,6 @@ export default function ProjectsPage() {
             try {
                 // Fetch user details and update store
                 const userData = await api.auth.me(storedToken);
-                console.log("user is", userData);
                 if (userData) {
                     setUser({ email: userData.user.email, name: userData.user.name, id: userData.user.id });
                 }

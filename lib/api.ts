@@ -136,7 +136,6 @@ export const api = {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(JSON.stringify(res, null, 2));
             return handleResponse(res);
         },
         get: async (id: string, token: string): Promise<any> => {
@@ -146,9 +145,7 @@ export const api = {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            const data = await handleResponse(res);
-            console.log(`[API] GET /projects/${id} response:`, data);
-            return data;
+            return handleResponse(res);
         },
         delete: async (id: string, token: string): Promise<any> => {
             const res = await fetchWithPlatformAuth(`${API_BASE_URL}/projects/${id}`, {
@@ -197,7 +194,6 @@ export const api = {
             return handleResponse(res);
         },
         createTable: async (apiKey: string, schema: any): Promise<any> => {
-            console.log(`[API] POST /db/tables request:`, schema, apiKey);
             const res = await fetch(`${API_BASE_URL}/db/tables`, {
                 method: "POST",
                 headers: {
@@ -424,6 +420,14 @@ export const api = {
             const res = await fetch(`${API_BASE_URL}/cron/${id}/executions/${executionId}`, {
                 method: "GET",
                 headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        update: async (apiKey: string, id: string, data: any): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/cron/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+                body: JSON.stringify(data),
             });
             return handleResponse(res);
         }

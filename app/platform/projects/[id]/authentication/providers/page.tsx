@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { API_BASE_URL } from '@/lib/api';
 import { api } from '@/lib/api';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -173,7 +174,7 @@ export default function ProvidersPage() {
                             <div className="grid gap-2 pt-2">
                                 <Label className="text-gray-300">Redirect URL</Label>
                                 <div className="p-3 bg-neutral-950 rounded-md border border-white/10 text-sm text-gray-400 font-mono break-all">
-                                    https://api.corebase.dev/v1/auth/callback/google
+                                    {`${API_BASE_URL}/auth/project/auth/google/callback`}
                                 </div>
                                 <p className="text-xs text-gray-500">Add this URL to your Google Cloud Console configuration.</p>
                             </div>
@@ -225,7 +226,7 @@ export default function ProvidersPage() {
                             <div className="grid gap-2 pt-2">
                                 <Label className="text-gray-300">Redirect URL</Label>
                                 <div className="p-3 bg-neutral-950 rounded-md border border-white/10 text-sm text-gray-400 font-mono break-all">
-                                    https://api.corebase.dev/v1/auth/callback/github
+                                    {`${API_BASE_URL}/auth/project/auth/github/callback`}
                                 </div>
                                 <p className="text-xs text-gray-500">Add this URL to your GitHub OAuth App configuration.</p>
                             </div>

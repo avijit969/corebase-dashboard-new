@@ -132,7 +132,7 @@ export default function CronJobsPage() {
                     </div>
                     <h3 className="text-lg font-semibold text-white mb-2">No Scheduled Jobs</h3>
                     <p className="text-neutral-500 max-w-sm text-center mb-6">
-                        You haven't created any chron jobs yet. Build your first job to start automating tasks.
+                        You haven't created any cron jobs yet. Build your first job to start automating tasks.
                     </p>
                 </div>
             ) : (

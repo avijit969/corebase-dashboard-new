@@ -97,7 +97,7 @@ export function CreateCronJobSheet({ onSuccess }: CreateCronJobSheetProps) {
                     Create Job
                 </Button>
             </SheetTrigger>
-            <SheetContent className="bg-neutral-900 border-white/10 text-white sm:max-w-2xl w-full overflow-y-auto p-4" >
+            <SheetContent className="bg-neutral-900 border-white/10 text-white sm:max-w-2xl w-full overflow-y-auto p-4">
                 <SheetHeader>
                     <SheetTitle className="text-xl flex items-center gap-2 text-white">
                         <Clock className="w-5 h-5 text-primary-500" />
@@ -134,26 +134,18 @@ export function CreateCronJobSheet({ onSuccess }: CreateCronJobSheetProps) {
                                             <div className="space-y-4 mt-2">
                                                 <p className="text-neutral-400 text-sm">Select an example to apply it to your cron job.</p>
                                                 <div className="space-y-2 text-sm">
-                                                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample("*/5 * * * *")}>
-                                                        <span className="font-medium text-white">Every 5 minutes</span>
-                                                        <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">*/5 * * * *</code>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample("0 * * * *")}>
-                                                        <span className="font-medium text-white">Every hour</span>
-                                                        <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">0 * * * *</code>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample("0 0 * * *")}>
-                                                        <span className="font-medium text-white">Every day at midnight</span>
-                                                        <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">0 0 * * *</code>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample("0 0 * * 0")}>
-                                                        <span className="font-medium text-white">Every Sunday at midnight</span>
-                                                        <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">0 0 * * 0</code>
-                                                    </div>
-                                                    <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample("0 9 * * 1-5")}>
-                                                        <span className="font-medium text-white">Weekdays at 9:00 AM</span>
-                                                        <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">0 9 * * 1-5</code>
-                                                    </div>
+                                                    {[
+                                                        { label: "Every 5 minutes",        expr: "*/5 * * * *" },
+                                                        { label: "Every hour",             expr: "0 * * * *"   },
+                                                        { label: "Every day at midnight",  expr: "0 0 * * *"   },
+                                                        { label: "Every Sunday at midnight", expr: "0 0 * * 0" },
+                                                        { label: "Weekdays at 9:00 AM",    expr: "0 9 * * 1-5" },
+                                                    ].map(({ label, expr }) => (
+                                                        <div key={expr} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all" onClick={() => applyCronExample(expr)}>
+                                                            <span className="font-medium text-white">{label}</span>
+                                                            <code className="text-primary-400 font-mono bg-primary-500/10 px-2 py-1 rounded-md border border-primary-500/20">{expr}</code>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </DialogContent>
