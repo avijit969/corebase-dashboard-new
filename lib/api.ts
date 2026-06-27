@@ -433,6 +433,108 @@ export const api = {
             return handleResponse(res);
         }
     },
+    functions: {
+        create: async (apiKey: string, data: any): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+                body: JSON.stringify(data),
+            });
+            return handleResponse(res);
+        },
+        list: async (apiKey: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions`, {
+                method: "GET",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        get: async (apiKey: string, id: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}`, {
+                method: "GET",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        update: async (apiKey: string, id: string, data: any): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+                body: JSON.stringify(data),
+            });
+            return handleResponse(res);
+        },
+        delete: async (apiKey: string, id: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}`, {
+                method: "DELETE",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        deploy: async (apiKey: string, id: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}/deploy`, {
+                method: "POST",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        listDeployments: async (apiKey: string, id: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}/deployments`, {
+                method: "GET",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        listInvocations: async (apiKey: string, id: string): Promise<any> => {
+            const res = await fetch(`${API_BASE_URL}/functions/${id}/invocations`, {
+                method: "GET",
+                headers: { "x-api-key": apiKey },
+            });
+            return handleResponse(res);
+        },
+        // Invoke returns the deployed worker's RAW response (not the { data } envelope),
+        // so this does not use handleResponse. Gateway-level errors (e.g. not deployed)
+        // come back as our error envelope WITHOUT the duration header — surfaced as ApiError.
+        invoke: async (
+            apiKey: string,
+            name: string,
+            payload: { method?: string; body?: any } = {}
+        ): Promise<{ status_code: number; ok: boolean; duration_ms?: number; body: string }> => {
+            const method = payload.method || "POST";
+            const hasBody = method !== "GET" && method !== "HEAD" && payload.body !== undefined;
+            const res = await fetch(`${API_BASE_URL}/functions/${encodeURIComponent(name)}/invoke`, {
+                method,
+                headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+                body: hasBody
+                    ? (typeof payload.body === "string" ? payload.body : JSON.stringify(payload.body))
+                    : undefined,
+            });
+
+            const durationHeader = res.headers.get("x-corebase-duration-ms");
+            const text = await res.text();
+
+            // No duration header + error status => gateway-level error envelope.
+            if (durationHeader === null && !res.ok) {
+                let message = "Function invocation failed";
+                let code = "INVOKE_ERROR";
+                try {
+                    const j = JSON.parse(text);
+                    if (j.error) {
+                        message = j.error.message || message;
+                        code = j.error.code || code;
+                    }
+                } catch { /* not JSON */ }
+                throw new ApiError(message, res.status, code);
+            }
+
+            return {
+                status_code: res.status,
+                ok: res.ok,
+                duration_ms: durationHeader !== null ? Number(durationHeader) : undefined,
+                body: text,
+            };
+        },
+    },
     teams: {
         create: async (token: string, name: string, orgId?: string): Promise<any> => {
             const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams`, {

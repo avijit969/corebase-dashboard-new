@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { ConnectivitySection } from "@/components/landing/ConnectivitySection";
 import { CodePreviewSection } from "@/components/landing/CodePreviewSection";
 import { StatsSection } from "@/components/landing/StatsSection";
 import { CTASection } from "@/components/landing/CTASection";
@@ -64,6 +65,7 @@ export default function LandingPage() {
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto z-10">
         <HeroSection />
         <FeaturesSection />
+        <ConnectivitySection />
         <CodePreviewSection />
         <StatsSection />
         <CTASection />
