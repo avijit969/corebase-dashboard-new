@@ -45,6 +45,9 @@ export default function LandingPage() {
         style={{ transitionDelay: '2s' }}
       />
 
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(139,92,246,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(139,92,246,0.02)_1px,transparent_1px)] bg-[size:5rem_5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_60%,transparent_100%)] pointer-events-none z-0" />
+
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 border-b border-primary-500/10 bg-neutral-950/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -64,7 +67,7 @@ export default function LandingPage() {
 
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto z-10">
         <HeroSection />
-        <FeaturesSection />
+        {/* <FeaturesSection /> */}
         <ConnectivitySection />
         <CodePreviewSection />
         <StatsSection />
