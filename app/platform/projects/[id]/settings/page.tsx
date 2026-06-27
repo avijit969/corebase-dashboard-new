@@ -7,11 +7,13 @@ import { toast } from 'sonner';
 import { ProjectSettings } from '../_components/ProjectSettings';
 import { ProjectDetails } from '../types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useProjectStore } from '@/lib/stores/project-store';
 
 export default function ProjectSettingsPage() {
     const params = useParams();
     const router = useRouter();
     const id = params?.id as string;
+    const { setProjectName } = useProjectStore();
 
     const [project, setProject] = useState<ProjectDetails | null>(null);
     const [loading, setLoading] = useState(true);
@@ -36,10 +38,20 @@ export default function ProjectSettingsPage() {
         }
     };
 
+    const handleRenameProject = async (name: string) => {
+        if (!id) return;
+        const token = localStorage.getItem("platform_token");
+        if (!token) return;
+
+        await api.projects.update(id, token, { name });
+        setProject(prev => prev ? { ...prev, meta: { ...prev.meta, name } } : prev);
+        setProjectName(name);
+        toast.success("Project renamed successfully");
+    };
+
     const handleDeleteProject = async () => {
         if (!project || !id) return;
 
-        // Confirmation is now handled by the UI dialog
         try {
             const token = localStorage.getItem("platform_token");
             if (!token) return;
@@ -66,7 +78,11 @@ export default function ProjectSettingsPage() {
     return (
         <div className="space-y-6 p-4">
             <h2 className="text-2xl font-bold text-white">Settings</h2>
-            <ProjectSettings projectName={project.meta.name} handleDeleteProject={handleDeleteProject} />
+            <ProjectSettings
+                projectName={project.meta.name}
+                handleDeleteProject={handleDeleteProject}
+                handleRenameProject={handleRenameProject}
+            />
         </div>
     );
 }

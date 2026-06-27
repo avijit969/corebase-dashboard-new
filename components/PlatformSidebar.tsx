@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Layers, LogOut, Settings, User, Database, Users, ChevronDown, Plus, Folder, Shield, Table, Clock, Mail } from 'lucide-react';
+import { Layers, LogOut, Settings, User, Database, Users, ChevronDown, Plus, Folder, Shield, Table, Clock, Mail, Building2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { useOrgStore } from '@/lib/stores/org-store';
 import Logo from './Logo';
 
 interface Project {
@@ -21,48 +22,53 @@ interface Project {
     name: string;
 }
 
+interface Org {
+    id: string;
+    name: string;
+    slug: string;
+    role: string;
+}
+
 export function PlatformSidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [projects, setProjects] = useState<Project[]>([]);
     const [currentProject, setCurrentProject] = useState<Project | null>(null);
+    const [orgs, setOrgs] = useState<Org[]>([]);
     const { token } = useAuthStore();
 
-    // Check if we are in a project view
     const isProjectView = pathname?.includes('/platform/projects/');
     const projectId = isProjectView ? pathname?.split('/')[3] : null;
 
     useEffect(() => {
-        const fetchProjects = async () => {
+        const fetchData = async () => {
             if (!token) return;
             try {
-                const data = await api.projects.list(token);
-                // Handle list structure same as page.tsx
+                const [projectData, orgData] = await Promise.all([
+                    api.projects.list(token),
+                    api.orgs.list(token).catch(() => [])
+                ]);
                 let projectsList: Project[] = [];
-                if (Array.isArray(data)) {
-                    projectsList = data;
-                } else if (data && Array.isArray((data as any).projects)) {
-                    projectsList = (data as any).projects;
-                } else if (data && Array.isArray((data as any).data)) {
-                    projectsList = (data as any).data;
-                }
+                if (Array.isArray(projectData)) projectsList = projectData;
+                else if (projectData && Array.isArray((projectData as any).projects)) projectsList = (projectData as any).projects;
+                else if (projectData && Array.isArray((projectData as any).data)) projectsList = (projectData as any).data;
                 setProjects(projectsList);
+                setOrgs(Array.isArray(orgData) ? orgData : []);
 
                 if (projectId) {
                     const current = projectsList.find(p => p.id === projectId);
                     if (current) setCurrentProject(current);
                 }
             } catch (e) {
-                console.error("Failed to fetch projects for sidebar", e);
+                console.error("Failed to fetch sidebar data", e);
             }
         };
-
-        fetchProjects();
+        fetchData();
     }, [projectId, token]);
 
     return (
         <aside className="w-64 border-r border-white/10 bg-black hidden md:flex flex-col sticky top-0 h-screen z-50">
-            <SidebarContent projects={projects} currentProject={currentProject} isProjectView={isProjectView} projectId={projectId} router={router} setCurrentProject={setCurrentProject} />
+            <SidebarContent projects={projects} orgs={orgs} currentProject={currentProject} isProjectView={isProjectView} projectId={projectId} router={router} setCurrentProject={setCurrentProject} />
         </aside>
     );
 }
@@ -72,66 +78,62 @@ export function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
     const router = useRouter();
     const [projects, setProjects] = useState<Project[]>([]);
     const [currentProject, setCurrentProject] = useState<Project | null>(null);
+    const [orgs, setOrgs] = useState<Org[]>([]);
     const { token } = useAuthStore();
 
-    // Check if we are in a project view
     const isProjectView = pathname?.includes('/platform/projects/');
     const projectId = isProjectView ? pathname?.split('/')[3] : null;
 
     useEffect(() => {
-        const fetchProjects = async () => {
+        const fetchData = async () => {
             if (!token) return;
             try {
-                const data = await api.projects.list(token);
+                const [projectData, orgData] = await Promise.all([
+                    api.projects.list(token),
+                    api.orgs.list(token).catch(() => [])
+                ]);
                 let projectsList: Project[] = [];
-                if (Array.isArray(data)) {
-                    projectsList = data;
-                } else if (data && Array.isArray((data as any).projects)) {
-                    projectsList = (data as any).projects;
-                } else if (data && Array.isArray((data as any).data)) {
-                    projectsList = (data as any).data;
-                }
+                if (Array.isArray(projectData)) projectsList = projectData;
+                else if (projectData && Array.isArray((projectData as any).projects)) projectsList = (projectData as any).projects;
+                else if (projectData && Array.isArray((projectData as any).data)) projectsList = (projectData as any).data;
                 setProjects(projectsList);
+                setOrgs(Array.isArray(orgData) ? orgData : []);
 
                 if (projectId) {
                     const current = projectsList.find(p => p.id === projectId);
                     if (current) setCurrentProject(current);
                 }
             } catch (e) {
-                console.error("Failed to fetch projects for sidebar", e);
+                console.error("Failed to fetch sidebar data", e);
             }
         };
-        fetchProjects();
+        fetchData();
     }, [projectId, token]);
 
     useEffect(() => {
-        if (isOpen) {
-            onClose();
-        }
+        if (isOpen) onClose();
     }, [pathname]);
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex md:hidden">
-            {/* Backdrop */}
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-
-            {/* Sidebar Panel */}
             <div className="relative flex-1 w-full max-w-xs bg-black border-r border-white/10 p-4 h-full overflow-y-auto animate-in slide-in-from-left duration-300">
                 <Button variant="ghost" size="icon" className="absolute top-2 right-2 text-gray-400" onClick={onClose}>
                     <LogOut className="w-5 h-5 rotate-180" />
                 </Button>
                 <div className="mt-8 h-full flex flex-col">
-                    <SidebarContent projects={projects} currentProject={currentProject} isProjectView={isProjectView} projectId={projectId} router={router} setCurrentProject={setCurrentProject} />
+                    <SidebarContent projects={projects} orgs={orgs} currentProject={currentProject} isProjectView={isProjectView} projectId={projectId} router={router} setCurrentProject={setCurrentProject} />
                 </div>
             </div>
         </div>
     );
 }
 
-function SidebarContent({ projects, currentProject, isProjectView, projectId, router, setCurrentProject }: {
+function SidebarContent({ projects, orgs, currentProject, isProjectView, projectId, router, setCurrentProject }: {
     projects: Project[];
+    orgs: Org[];
     currentProject: Project | null;
     isProjectView: boolean | null | undefined;
     projectId: string | null | undefined;
@@ -140,15 +142,19 @@ function SidebarContent({ projects, currentProject, isProjectView, projectId, ro
 }) {
     const pathname = usePathname();
     const { user, logout } = useAuthStore();
+    const { currentOrgId, currentOrgName, setOrg, clearOrg } = useOrgStore();
 
     const handleLogout = () => {
         logout();
         router.push('/');
     };
 
+    const contextLabel = currentProject ? currentProject.name : (currentOrgName ?? 'Personal');
+    const contextSub = currentProject ? 'Project' : (currentOrgId ? 'Organization' : 'Personal');
+
     return (
         <>
-            {/* Project Switcher / Brand Header */}
+            {/* Org / Context Switcher */}
             <div className="m-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -156,39 +162,30 @@ function SidebarContent({ projects, currentProject, isProjectView, projectId, ro
                             <div className="flex items-center gap-3">
                                 <Logo />
                                 <div className="flex flex-col items-start overflow-hidden">
-                                    <span className="text-sm font-bold truncate">
-                                        {currentProject ? currentProject.name : "CoreBase"}
-                                    </span>
-                                    <span className="text-xs text-gray-500 font-normal">
-                                        {currentProject ? "Project" : "Platform"}
-                                    </span>
+                                    <span className="text-sm font-bold truncate">{contextLabel}</span>
+                                    <span className="text-xs text-gray-500 font-normal">{contextSub}</span>
                                 </div>
                             </div>
                             <ChevronDown className="w-4 h-4 text-gray-500" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 bg-neutral-900 border-white/10 text-white" align="start">
-                        <DropdownMenuItem onClick={() => {
-                            router.push('/platform');
-                            setCurrentProject(null);
-                        }} className="focus:bg-white/10 cursor-pointer">
-                            <Layers className="mr-2 h-4 w-4" />
-                            All Projects
+                        <DropdownMenuItem onClick={() => { clearOrg(); router.push('/platform'); }} className="focus:bg-white/10 cursor-pointer">
+                            {!currentOrgId && <Check className="mr-2 h-4 w-4 text-primary-400" />}
+                            {currentOrgId && <span className="mr-2 w-4" />}
+                            Personal
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-white/10" />
-                        {projects.map(project => (
-                            <DropdownMenuItem key={project.id} onClick={() => {
-                                router.push(`/platform/projects/${project.id}`);
-                                setCurrentProject(project);
-                            }} className="focus:bg-white/10 cursor-pointer">
-                                <div className="w-2 h-2 rounded-full bg-primary-500 mr-2" />
-                                {project.name}
+                        {orgs.length > 0 && <DropdownMenuSeparator className="bg-white/10" />}
+                        {orgs.map(org => (
+                            <DropdownMenuItem key={org.id} onClick={() => { setOrg(org.id, org.name); router.push('/platform'); }} className="focus:bg-white/10 cursor-pointer">
+                                {currentOrgId === org.id ? <Check className="mr-2 h-4 w-4 text-primary-400" /> : <Building2 className="mr-2 h-4 w-4 text-gray-500" />}
+                                {org.name}
                             </DropdownMenuItem>
                         ))}
                         <DropdownMenuSeparator className="bg-white/10" />
-                        <DropdownMenuItem onClick={() => router.push('/platform')} className="focus:bg-white/10 cursor-pointer text-primary-400 focus:text-primary-400">
+                        <DropdownMenuItem onClick={() => router.push('/platform/organizations')} className="focus:bg-white/10 cursor-pointer text-primary-400 focus:text-primary-400">
                             <Plus className="mr-2 h-4 w-4" />
-                            Create Project
+                            Create Organization
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -204,6 +201,8 @@ function SidebarContent({ projects, currentProject, isProjectView, projectId, ro
                         {!isProjectView && (
                             <div className="flex flex-col gap-2">
                                 <NavLink href="/platform" icon={<Layers className="w-4 h-4" />} active={pathname === `/platform`}>Projects</NavLink>
+                                <NavLink href="/platform/organizations" icon={<Building2 className="w-4 h-4" />} active={pathname?.startsWith(`/platform/organizations`)}>Organizations</NavLink>
+                                <NavLink href="/platform/teams" icon={<Users className="w-4 h-4" />} active={pathname?.startsWith(`/platform/teams`)}>Teams</NavLink>
                                 <NavLink href="/platform/settings" icon={<Settings className="w-4 h-4" />} active={pathname === `/platform/settings`}>Settings</NavLink>
                             </div>
                         )}

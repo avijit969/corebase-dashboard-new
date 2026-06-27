@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, MoreVertical, Copy, Database, Loader2, AlertTriangle } from 'lucide-react';
+import { Plus, Search, MoreVertical, Copy, Database, Loader2, AlertTriangle, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProjectStore } from '@/lib/stores/project-store';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { useOrgStore } from '@/lib/stores/org-store';
 
 interface Project {
     id: string;
@@ -48,8 +49,12 @@ export default function ProjectsPage() {
     const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
     const [deleteConfirmName, setDeleteConfirmName] = useState('');
     const [deleting, setDeleting] = useState(false);
+    const [projectToRename, setProjectToRename] = useState<Project | null>(null);
+    const [renameValue, setRenameValue] = useState('');
+    const [renaming, setRenaming] = useState(false);
     const { setApiKey, setProjectName } = useProjectStore();
     const { setUser } = useAuthStore();
+    const { currentOrgId, currentOrgName } = useOrgStore();
 
     useEffect(() => {
         const init = async () => {
@@ -61,14 +66,10 @@ export default function ProjectsPage() {
             setToken(storedToken);
 
             try {
-                // Fetch user details and update store
                 const userData = await api.auth.me(storedToken);
                 if (userData) {
                     setUser({ email: userData.user.email, name: userData.user.name, id: userData.user.id });
                 }
-
-                // Fetch projects
-                await fetchProjects(storedToken);
             } catch (error) {
                 console.error("Failed to initialize platform:", error);
             }
@@ -77,10 +78,14 @@ export default function ProjectsPage() {
         init();
     }, [router, setUser]);
 
+    useEffect(() => {
+        if (token) fetchProjects(token);
+    }, [token, currentOrgId]);
+
     const fetchProjects = async (authToken: string) => {
         try {
             setLoading(true);
-            const data = await api.projects.list(authToken);
+            const data = await api.projects.list(authToken, currentOrgId ?? undefined);
             let projectsList: Project[] = [];
             if (Array.isArray(data)) {
                 projectsList = data;
@@ -103,7 +108,7 @@ export default function ProjectsPage() {
 
         setCreating(true);
         try {
-            const response = await api.projects.create(newProjectName, token);
+            const response = await api.projects.create(newProjectName, token, currentOrgId ?? undefined);
 
             const newProject: Project = {
                 id: response.id,
@@ -147,6 +152,23 @@ export default function ProjectsPage() {
         }
     };
 
+    const handleRenameProject = async () => {
+        if (!projectToRename || !token || !renameValue.trim()) return;
+        setRenaming(true);
+        try {
+            await api.projects.update(projectToRename.id, token, { name: renameValue.trim() });
+            setProjects(projects.map(p => p.id === projectToRename.id ? { ...p, name: renameValue.trim() } : p));
+            setProjectName(renameValue.trim());
+            toast.success("Project renamed successfully");
+            setProjectToRename(null);
+            setRenameValue('');
+        } catch (error: any) {
+            toast.error("Failed to rename project", { description: error.message });
+        } finally {
+            setRenaming(false);
+        }
+    };
+
     const copyToClipboard = (text: string, e: React.MouseEvent) => {
         e.stopPropagation();
         navigator.clipboard.writeText(text);
@@ -186,8 +208,12 @@ export default function ProjectsPage() {
         <div className="p-8 max-w-7xl mx-auto min-h-full">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Projects</h1>
-                    <p className="text-gray-400">Manage your applications and API keys.</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">
+                        {currentOrgName ? `${currentOrgName}` : 'Projects'}
+                    </h1>
+                    <p className="text-gray-400">
+                        {currentOrgId ? 'Organization projects and shared workspaces.' : 'Your personal projects and API keys.'}
+                    </p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -272,6 +298,17 @@ export default function ProjectsPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="bg-neutral-900 border-white/10 text-white">
                                             <DropdownMenuItem
+                                                className="focus:bg-white/10 cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setProjectToRename(project);
+                                                    setRenameValue(project.name);
+                                                }}
+                                            >
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Rename
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
                                                 className="focus:bg-white/10 cursor-pointer text-red-400 focus:text-red-400"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -340,6 +377,39 @@ export default function ProjectsPage() {
                     </motion.div>
                 )}
             </div>
+
+            {/* Rename Dialog */}
+            <Dialog open={!!projectToRename} onOpenChange={(open) => {
+                if (!open) { setProjectToRename(null); setRenameValue(''); }
+            }}>
+                <DialogContent className="bg-neutral-900 border-white/10 text-white sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Rename Project</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Enter a new name for <span className="text-white font-semibold">{projectToRename?.name}</span>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Input
+                            value={renameValue}
+                            onChange={(e) => setRenameValue(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleRenameProject()}
+                            className="bg-black/50 border-white/20 text-white focus-visible:ring-primary-500"
+                            placeholder="Project name"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => { setProjectToRename(null); setRenameValue(''); }} className="text-gray-400 hover:text-white hover:bg-white/10">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleRenameProject} disabled={!renameValue.trim() || renaming} className="bg-primary-600 hover:bg-primary-700 text-white">
+                            {renaming && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Rename
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={!!projectToDelete} onOpenChange={(open) => {

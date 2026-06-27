@@ -118,19 +118,20 @@ export const api = {
         },
     },
     projects: {
-        create: async (name: string, token: string): Promise<any> => {
+        create: async (name: string, token: string, orgId?: string): Promise<any> => {
             const res = await fetchWithPlatformAuth(`${API_BASE_URL}/projects`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ name, ...(orgId ? { org_id: orgId } : {}) }),
             });
             return handleResponse(res);
         },
-        list: async (token: string): Promise<any> => {
-            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/projects`, {
+        list: async (token: string, orgId?: string): Promise<any> => {
+            const url = orgId ? `${API_BASE_URL}/projects?org_id=${orgId}` : `${API_BASE_URL}/projects`;
+            const res = await fetchWithPlatformAuth(url, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -431,6 +432,148 @@ export const api = {
             });
             return handleResponse(res);
         }
+    },
+    teams: {
+        create: async (token: string, name: string, orgId?: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ name, ...(orgId ? { org_id: orgId } : {}) }),
+            });
+            return handleResponse(res);
+        },
+        list: async (token: string, orgId?: string): Promise<any> => {
+            const url = orgId ? `${API_BASE_URL}/teams?org_id=${orgId}` : `${API_BASE_URL}/teams`;
+            const res = await fetchWithPlatformAuth(url, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        get: async (token: string, teamId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        update: async (token: string, teamId: string, name: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ name }),
+            });
+            return handleResponse(res);
+        },
+        delete: async (token: string, teamId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        addMember: async (token: string, teamId: string, email: string, role: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/members`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ email, role }),
+            });
+            return handleResponse(res);
+        },
+        updateMember: async (token: string, teamId: string, userId: string, role: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/members/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ role }),
+            });
+            return handleResponse(res);
+        },
+        removeMember: async (token: string, teamId: string, userId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/members/${userId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        listProjects: async (token: string, teamId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/projects`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        assignProject: async (token: string, teamId: string, projectId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/projects`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ project_id: projectId }),
+            });
+            return handleResponse(res);
+        },
+        removeProject: async (token: string, teamId: string, projectId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/teams/${teamId}/projects/${projectId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+    },
+    orgs: {
+        create: async (token: string, name: string, slug: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ name, slug }),
+            });
+            return handleResponse(res);
+        },
+        list: async (token: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        get: async (token: string, orgId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        update: async (token: string, orgId: string, data: { name: string; slug?: string }): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify(data),
+            });
+            return handleResponse(res);
+        },
+        delete: async (token: string, orgId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
+        addMember: async (token: string, orgId: string, email: string, role: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}/members`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ email, role }),
+            });
+            return handleResponse(res);
+        },
+        updateMember: async (token: string, orgId: string, userId: string, role: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}/members/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ role }),
+            });
+            return handleResponse(res);
+        },
+        removeMember: async (token: string, orgId: string, userId: string): Promise<any> => {
+            const res = await fetchWithPlatformAuth(`${API_BASE_URL}/orgs/${orgId}/members/${userId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return handleResponse(res);
+        },
     },
     customEmail: {
         create: async (apiKey: string, data: { name: string; subject: string; body: string }): Promise<any> => {
