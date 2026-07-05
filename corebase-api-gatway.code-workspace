@@ -5,6 +5,15 @@
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "../../corebase-documendation"
+		},
+		{
+			"path": "../../corebase-js-library"
+		},
+		{
+			"path": "../../create-corebase-app"
 		}
 	]
 }

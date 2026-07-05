@@ -29,6 +29,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [checkingOrgs, setCheckingOrgs] = useState(true);
     const [userOrgs, setUserOrgs] = useState<any[]>([]);
+    const [orgSetupSkipped, setOrgSetupSkipped] = useState(false);
 
     // Org creation form state
     const [newOrgName, setNewOrgName] = useState('');
@@ -50,6 +51,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
                 return;
             }
             setIsAuthLoading(false);
+            setOrgSetupSkipped(localStorage.getItem("corebase_org_setup_skipped") === "true");
 
             try {
                 const orgData = await api.orgs.list(token);
@@ -101,6 +103,11 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
         router.push('/');
     };
 
+    const handleSkipOrgSetup = () => {
+        localStorage.setItem("corebase_org_setup_skipped", "true");
+        setOrgSetupSkipped(true);
+    };
+
     if (isAuthLoading || (checkingOrgs && !pathname?.startsWith('/platform/login') && !pathname?.startsWith('/platform/signup'))) {
         return (
             <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -141,7 +148,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
             </main>
 
             {/* First-time Organization Dialog */}
-            <Dialog open={userOrgs.length === 0} onOpenChange={() => {}}>
+            <Dialog open={userOrgs.length === 0 && !orgSetupSkipped} onOpenChange={() => {}}>
                 <DialogContent
                     className="bg-neutral-900 border-white/10 text-white sm:max-w-[425px]"
                     showCloseButton={false}
@@ -154,7 +161,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
                             Create your Organization
                         </DialogTitle>
                         <DialogDescription className="text-gray-400 pt-1">
-                            To get started with CoreBase, you need to create an organization first.
+                            Organizations let you share projects and teams with others. You can also skip this and use personal projects instead.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -200,20 +207,30 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
                             >
                                 Sign out
                             </Button>
-                            <Button
-                                type="submit"
-                                disabled={creatingOrg || !newOrgName.trim() || !newOrgSlug.trim()}
-                                className="bg-primary-600 hover:bg-primary-700 text-white border-0"
-                            >
-                                {creatingOrg ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Creating...
-                                    </>
-                                ) : (
-                                    "Create Organization"
-                                )}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={handleSkipOrgSetup}
+                                    className="text-gray-400 hover:text-white hover:bg-white/5"
+                                >
+                                    Skip for now
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={creatingOrg || !newOrgName.trim() || !newOrgSlug.trim()}
+                                    className="bg-primary-600 hover:bg-primary-700 text-white border-0"
+                                >
+                                    {creatingOrg ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        "Create Organization"
+                                    )}
+                                </Button>
+                            </div>
                         </DialogFooter>
                     </form>
                 </DialogContent>
