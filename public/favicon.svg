@@ -9,13 +9,13 @@
     .layer-bot { animation: stack-bounce 2.5s ease-in-out infinite; animation-delay: 0.3s; }
   </style>
   <defs>
-    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8B5CF6" />
-      <stop offset="100%" stop-color="#4F46E5" />
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C" />
+      <stop offset="100%" stop-color="#EA580C" />
     </linearGradient>
   </defs>
 
-  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#purpleGradient)"/>
+  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brandGradient)"/>
   
   <g stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round" stroke-linecap="round" fill="none">
     <path class="layer-top" d="M 100 55 L 140 73 L 100 91 L 60 73 Z" />

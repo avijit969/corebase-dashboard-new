@@ -1,46 +1,35 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+
+const STATS = [
+    { value: "99.99", unit: "%", label: "Uptime" },
+    { value: "50", unit: "ms", label: "Latency" },
+    { value: "10", unit: "k+", label: "Developers" },
+    { value: "1", unit: "B+", label: "Requests" },
+];
+// Non-uniform stagger reads as one motion, not four
+const DELAYS = [0, 0.05, 0.09, 0.12];
 
 export function StatsSection() {
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15, delayChildren: 0.1 }
-        }
-    };
-
-    const statVariants = {
-        hidden: { opacity: 0, scale: 0.8, y: 20 },
-        visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, type: "spring" as const, bounce: 0.4 } }
-    };
-
+    const reduce = useReducedMotion();
     return (
-        <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            variants={containerVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-24 lg:mb-32 border-y border-white/5 py-12 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl mx-2 md:mx-0 relative overflow-hidden"
-        >
-            <div className="absolute inset-0 bg-linear-to-r from-primary-600/5 via-transparent to-primary-600/5 pointer-events-none" />
-
-            <motion.div variants={statVariants} className="text-center relative z-10">
-                <div className="text-3xl md:text-5xl font-bold text-white mb-2">99.99<span className="text-primary-400">%</span></div>
-                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Uptime</div>
-            </motion.div>
-            <motion.div variants={statVariants} className="text-center relative z-10">
-                <div className="text-3xl md:text-5xl font-bold text-white mb-2">50<span className="text-primary-400">ms</span></div>
-                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Latency</div>
-            </motion.div>
-            <motion.div variants={statVariants} className="text-center relative z-10">
-                <div className="text-3xl md:text-5xl font-bold text-white mb-2">10<span className="text-primary-400">k+</span></div>
-                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Developers</div>
-            </motion.div>
-            <motion.div variants={statVariants} className="text-center relative z-10">
-                <div className="text-3xl md:text-5xl font-bold text-white mb-2">1<span className="text-primary-400">B+</span></div>
-                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wider font-semibold">Requests</div>
-            </motion.div>
-        </motion.div>
+        <section className="grid grid-cols-2 md:grid-cols-4 mb-24 lg:mb-36 rounded-3xl border border-stone-200 bg-white shadow-[0_1px_2px_rgb(68_37_10/0.04),0_20px_50px_-30px_rgb(154_52_18/0.25)] overflow-hidden">
+            {STATS.map((s, i) => (
+                <motion.div
+                    key={s.label}
+                    initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.5, delay: DELAYS[i], ease: [0.23, 1, 0.32, 1] }}
+                    className={`text-center py-10 md:py-12 border-stone-100 ${i % 2 ? "" : "border-r"} ${i < 2 ? "border-b md:border-b-0" : ""} ${i === 1 ? "md:border-r" : ""}`}
+                >
+                    <div className="text-3xl md:text-5xl font-bold tracking-tight text-stone-900 mb-2 tabular-nums">
+                        {s.value}
+                        <span className="text-primary-600">{s.unit}</span>
+                    </div>
+                    <div className="text-xs md:text-sm text-stone-500 uppercase tracking-wider font-semibold">{s.label}</div>
+                </motion.div>
+            ))}
+        </section>
     );
 }

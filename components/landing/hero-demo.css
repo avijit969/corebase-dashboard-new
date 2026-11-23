@@ -1,0 +1,233 @@
+/* CoreBase hero demo. The stage sits directly on the page (no plate);
+   the dashboard runs off the bottom edge, the terminal straddles its right. */
+.cbd .ss-stage {
+  overflow: hidden;
+  background: transparent;
+  --ss-term-sigil: #fb923c;
+  --ss-term-ok: #4ade80;
+}
+
+.cbd-win {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 840px;
+  box-shadow:
+    0 1px 2px rgba(68, 37, 10, 0.06),
+    0 24px 60px -20px rgba(154, 52, 18, 0.22);
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-win {
+  top: 12px;
+  left: 12px;
+  width: 334px;
+}
+
+/* Sidebar */
+.cbd-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 44px 10px 0;
+  font-size: 13px;
+  color: var(--ss-text);
+}
+
+.cbd-proj {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 12px;
+  color: var(--ss-text-strong);
+  font-weight: 600;
+}
+
+.cbd-proj-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.cbd-nav {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 7px;
+  white-space: nowrap;
+}
+
+.cbd-nav[data-active] {
+  background: var(--ss-accent-soft);
+  color: var(--ss-accent-text);
+  font-weight: 500;
+}
+
+/* Content */
+.cbd-main {
+  min-height: 560px;
+  padding: 16px 20px 0;
+  background: var(--ss-surface);
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-main {
+  padding: 14px 14px 0;
+}
+
+.cbd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cbd-title {
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ss-text-strong);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cbd-count {
+  padding-right: 10px;
+  color: var(--ss-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cbd-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 70px 90px;
+  align-items: center;
+  gap: 16px;
+  height: 42px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--ss-line-faint);
+  color: var(--ss-text-strong);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-row {
+  grid-template-columns: minmax(0, 1fr) 56px;
+  gap: 10px;
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-email,
+.cbd .ss-stage[data-layout='compact'] .cbd-created {
+  display: none;
+}
+
+.cbd-row--head {
+  height: 34px;
+  border-radius: 6px;
+  border-bottom: 0;
+  background: var(--ss-canvas);
+  color: var(--ss-text);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+}
+
+.cbd-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.cbd-email,
+.cbd-created {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ss-text);
+}
+
+/* One orange wash when a row arrives, then gone */
+.cbd-row::before {
+  content: '';
+  position: absolute;
+  inset: 3px 0;
+  border-radius: 6px;
+  background: var(--ss-accent-soft);
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+
+.cbd-row[data-wash]::before {
+  opacity: 1;
+  transition-duration: 0.12s;
+}
+
+/* Terminal satellite, straddling the dashboard's right edge */
+.cbd-term {
+  position: absolute;
+  top: 236px;
+  right: 24px;
+  width: 530px;
+  box-shadow: 0 30px 70px -24px rgba(28, 25, 23, 0.45);
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-term {
+  top: auto;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  width: auto;
+}
+
+.cbd-term-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 18px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #e7e5e4;
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-term-body {
+  font-size: 11px;
+  padding: 12px 12px 14px;
+}
+
+.cbd-line {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-line {
+  white-space: normal;
+}
+
+.cbd-sigil {
+  color: var(--ss-term-sigil);
+}
+
+.cbd-kw { color: #fdba74; }
+.cbd-fn { color: #93c5fd; }
+.cbd-str { color: #86efac; }
+.cbd-ok { color: var(--ss-term-ok); }
+.cbd-dim { color: #a8a29e; }
+
+.cbd-res {
+  padding: 2px 0 0 16px;
+}
+
+.cbd-caret {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin: 0 1px -2px;
+  background: #fb923c;
+}
+
+.cbd .ss-stage[data-layout='compact'] .cbd-rt {
+  display: none;
+}

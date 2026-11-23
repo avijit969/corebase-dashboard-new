@@ -171,16 +171,16 @@ export function ConnectivitySection() {
                 initial={reduce ? { opacity: 1 } : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
                 className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
             >
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-stone-900">
                     One backend.{" "}
-                    <span className="bg-clip-text text-transparent bg-linear-to-r from-primary-400 via-primary-200 to-primary-400 animate-gradient-x">
+                    <span className="bg-clip-text text-transparent bg-linear-to-br from-primary-500 via-primary-600 to-primary-800">
                         Every service.
                     </span>
                 </h2>
-                <p className="text-lg text-gray-400 leading-relaxed">
+                <p className="text-lg text-stone-600 leading-relaxed">
                     Auth, storage, database, and realtime — unified under CoreBase.
                 </p>
             </motion.div>
@@ -196,9 +196,9 @@ export function ConnectivitySection() {
                 >
                     <defs>
                         <radialGradient id="cb-centerGlow" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.6" />
-                            <stop offset="60%" stopColor="#8B5CF6" stopOpacity="0.2" />
-                            <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
+                            <stop offset="0%" stopColor="#FB923C" stopOpacity="0.45" />
+                            <stop offset="60%" stopColor="#FB923C" stopOpacity="0.15" />
+                            <stop offset="100%" stopColor="#FB923C" stopOpacity="0" />
                         </radialGradient>
                         <filter id="cb-glow" x="-50%" y="-50%" width="200%" height="200%">
                             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -225,7 +225,7 @@ export function ConnectivitySection() {
                                 <motion.path
                                     d={d}
                                     fill="none"
-                                    stroke="#8b5cf6"
+                                    stroke="#f97316"
                                     strokeWidth={6}
                                     strokeLinecap="round"
                                     opacity={0.15}
@@ -238,7 +238,7 @@ export function ConnectivitySection() {
                                 <motion.path
                                     d={d}
                                     fill="none"
-                                    stroke="#a78bfa"
+                                    stroke="#fb923c"
                                     strokeWidth={2}
                                     strokeLinecap="round"
                                     style={{
@@ -251,8 +251,8 @@ export function ConnectivitySection() {
                                     <motion.path
                                         d={d}
                                         fill="none"
-                                        stroke="#ffffff"
-                                        strokeWidth={6}
+                                        stroke="#ea580c"
+                                        strokeWidth={5}
                                         strokeLinecap="round"
                                         strokeDasharray="0 52"
                                         style={{
@@ -268,7 +268,7 @@ export function ConnectivitySection() {
                                     cy={coords.y}
                                     r={4}
                                     fill="#ffffff"
-                                    stroke="#a78bfa"
+                                    stroke="#fb923c"
                                     strokeWidth={2.5}
                                     filter="url(#cb-glow)"
                                     style={{
@@ -282,7 +282,7 @@ export function ConnectivitySection() {
                                     cy={endY}
                                     r={4}
                                     fill="#ffffff"
-                                    stroke="#a78bfa"
+                                    stroke="#fb923c"
                                     strokeWidth={2.5}
                                     filter="url(#cb-glow)"
                                     style={{
@@ -301,10 +301,10 @@ export function ConnectivitySection() {
                             <motion.g
                                 key={`node-${s.key}`}
                                 style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                                initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 0.6 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
+                                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 8 }}
+                                whileInView={{ opacity: 1, scale: 1, y: 0 }}
                                 viewport={{ once: true, amount: 0.4 }}
-                                transition={{ duration: 0.5, delay: i * 0.12, ease: "easeOut" }}
+                                transition={{ duration: 0.5, delay: [0.1, 0.16, 0.2, 0.26][i], ease: [0.23, 1, 0.32, 1] }}
                             >
                                 <foreignObject
                                     x={coords.x - nodeW / 2}
@@ -313,24 +313,11 @@ export function ConnectivitySection() {
                                     height={nodeH}
                                 >
                                     <div className="flex flex-col items-center gap-1.5 pt-2 text-center">
-                                        <motion.div
-                                            className="w-14 h-14 md:w-20 md:h-20 rounded-xl md:rounded-2xl bg-neutral-900/60 border border-primary-500/20 backdrop-blur-md flex items-center justify-center shadow-2xl shadow-primary-500/5 transition-all duration-300"
-                                            animate={reduce ? undefined : { y: [0, -8, 0] }}
-                                            transition={
-                                                reduce
-                                                    ? undefined
-                                                    : { duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }
-                                            }
-                                            whileHover={{
-                                                scale: 1.1,
-                                                borderColor: "rgba(168, 85, 247, 0.6)",
-                                                boxShadow: "0 0 25px rgba(168, 85, 247, 0.3)",
-                                            }}
-                                        >
-                                            <s.Icon className="w-6 h-6 md:w-9 md:h-9 color text-primary-400" />
-                                        </motion.div>
-                                        <span className="mt-1 text-sm md:text-lg font-semibold text-white">{s.label}</span>
-                                        <span className="text-[10px] md:text-sm text-gray-400 leading-snug max-w-[130px] md:max-w-[200px] block mt-0.5">
+                                        <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl md:rounded-2xl bg-white border border-stone-200 flex items-center justify-center shadow-[0_1px_2px_rgb(68_37_10/0.06),0_12px_32px_-12px_rgb(154_52_18/0.25)] transition-[transform,border-color,box-shadow] duration-200 ease-(--ease-out) [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5 [@media(hover:hover)_and_(pointer:fine)]:hover:border-primary-300">
+                                            <s.Icon className="w-6 h-6 md:w-9 md:h-9 text-primary-600" strokeWidth={1.75} />
+                                        </div>
+                                        <span className="mt-1 text-sm md:text-lg font-semibold text-stone-900">{s.label}</span>
+                                        <span className="text-[10px] md:text-sm text-stone-500 leading-snug max-w-[130px] md:max-w-[200px] block mt-0.5">
                                             {s.description}
                                         </span>
                                     </div>
@@ -342,30 +329,25 @@ export function ConnectivitySection() {
                     {/* Center CoreBase hub (rendered last so it sits above the trace ends) */}
                     <motion.g
                         style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                        initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 0.5 }}
+                        initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, amount: 0.4 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
                     >
                         {/* Soft circular glow drawn in SVG space, so it is never clipped into a box */}
                         <circle cx={CENTER.x} cy={CENTER.y} r={120} fill="url(#cb-centerGlow)" />
                         <foreignObject x={CENTER.x - 70} y={CENTER.y - 70} width={140} height={140}>
                             <div className="w-full h-full flex items-center justify-center">
-                                <motion.img
+                                <img
                                     src="/favicon.svg"
                                     alt="CoreBase"
-                                    className="w-24 h-24 rounded-3xl border border-primary-400/20"
-                                    animate={reduce ? undefined : { scale: [1, 1.05, 1] }}
-                                    transition={
-                                        reduce ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut" }
-                                    }
-                                    whileHover={{ scale: 1.1, filter: "brightness(1.1)" }}
+                                    className="w-24 h-24 rounded-3xl shadow-[0_16px_40px_-12px_rgb(234_88_12/0.55)]"
                                 />
                             </div>
                         </foreignObject>
                         <foreignObject x={CENTER.x - 100} y={CENTER.y + 66} width={200} height={36}>
                             <div className="text-center">
-                                <span className="text-lg font-semibold text-white">CoreBase</span>
+                                <span className="text-lg font-semibold text-stone-900">CoreBase</span>
                             </div>
                         </foreignObject>
                     </motion.g>

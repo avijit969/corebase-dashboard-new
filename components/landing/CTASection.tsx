@@ -1,42 +1,36 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export function CTASection() {
+    const reduce = useReducedMotion();
     return (
-        <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.3 }}
-            variants={{
-                hidden: { opacity: 0, y: 50, scale: 0.95 },
-                visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: "easeOut" } }
-            }}
-            className="relative rounded-[2rem] bg-linear-to-b from-primary-900/40 to-neutral-900 border border-primary-500/20 p-8 md:p-16 text-center overflow-hidden mb-12 shadow-2xl shadow-primary-900/20"
+        <motion.section
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+            className="relative rounded-[2rem] bg-linear-to-br from-primary-500 via-primary-600 to-primary-700 p-8 md:p-16 text-center overflow-hidden mb-12 shadow-[0_40px_80px_-40px_var(--primary-700)]"
         >
-            <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-primary-500/10 rounded-full blur-[80px] md:blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-primary-500/10 rounded-full blur-[80px] md:blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+            {/* Static light and texture; no looping glow */}
+            <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgb(255_255_255/0.22),transparent_70%)] pointer-events-none" />
+            <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.07)_1px,transparent_1px)] bg-size-[3rem_3rem] mask-[radial-gradient(ellipse_at_center,#000_30%,transparent_75%)] pointer-events-none" />
 
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 relative z-10">
-                Ready to <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-400 to-primary-600">Scale</span>?
+            <h2 className="relative text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6">
+                Ready to Scale?
             </h2>
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto relative z-10 leading-relaxed">
-                Join thousands of developers building the future with CoreBase.
-                Get started for free today.
+            <p className="relative text-lg md:text-xl text-primary-50/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Join thousands of developers building the future with CoreBase. Get started for free today.
             </p>
 
-            <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex justify-center relative z-10 w-full md:w-max mx-auto"
+            <Link
+                href="/platform/signup"
+                className="landing-press group relative inline-flex w-full md:w-auto h-14 items-center justify-center gap-2 rounded-full bg-white px-10 text-lg font-semibold text-primary-800 shadow-[0_10px_30px_-10px_rgb(67_20_7/0.5)] hover:bg-primary-50"
             >
-                <Link href="/platform/signup" className="w-full md:w-auto">
-                    <Button size="lg" className="w-full h-14 md:h-16 px-10 md:px-12 text-lg md:text-xl bg-white text-black hover:bg-primary-50 border-0 shadow-xl shadow-primary-900/20 rounded-full transition-all cursor-pointer font-semibold">
-                        Create Free Account
-                    </Button>
-                </Link>
-            </motion.div>
-        </motion.div>
+                Create Free Account
+                <ArrowRight className="h-5 w-5 transition-transform duration-200 ease-(--ease-out) [@media(hover:hover)]:group-hover:translate-x-0.5" />
+            </Link>
+        </motion.section>
     );
 }

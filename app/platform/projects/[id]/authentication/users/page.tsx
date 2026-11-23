@@ -36,7 +36,7 @@ const DEFAULT_EMAIL_TEMPLATE = `<!DOCTYPE html>
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     .header {
-      background-color: #8b5cf6; /* Purple/Primary */
+      background-color: #ea580c; /* Primary */
       padding: 32px 40px;
       text-align: center;
     }
@@ -68,7 +68,7 @@ const DEFAULT_EMAIL_TEMPLATE = `<!DOCTYPE html>
     }
     .button {
       display: inline-block;
-      background-color: #8b5cf6;
+      background-color: #ea580c;
       color: #ffffff;
       padding: 14px 32px;
       text-decoration: none;
